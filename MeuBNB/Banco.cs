@@ -4,6 +4,7 @@ using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Configuration;
 
 namespace MeuBNB
 {
@@ -11,7 +12,7 @@ namespace MeuBNB
     {
         public static SqlConnection Abrir()
         {
-            string strCon = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=C:\Users\eduar\OneDrive\Desktop\MeuBNB\MeuBNB\Database1.mdf;Integrated Security=True";
+            string strCon = ConfigurationManager.ConnectionStrings["ConexaoMeuBNB"].ConnectionString;
             SqlConnection cnn = new SqlConnection(strCon);
             cnn.Open();
             return cnn;

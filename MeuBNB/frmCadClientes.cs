@@ -27,27 +27,93 @@ namespace MeuBNB
         }
         public override void Salvar()
         {
-            oCliente.IdCliente = Convert.ToInt32(txtId.Text);
-            oCliente.Nome = txtNome.Text;
-            oCliente.Cpf = txtCpf.Text;
-            oCliente.DataInicioReserva = Convert.ToDateTime(txtDataInicio.Text);
-            oCliente.DataFimReserva = Convert.ToDateTime(txtDataFim.Text);
-            oCliente.Diarias = Convert.ToInt32(txtDiarias.Text);
-            oCliente.QtdPessoas = Convert.ToInt32(txtQtd.Text);
-            oCliente.Telefone = txtTelefone.Text;
-            oCliente.ValorPago = Convert.ToDouble(txtValorPago.Text);
-            oCliente.FormaPagamento = txtFormaPag.Text;
-            if (this.btnSalvar.Text == "SALVAR")
+            //Validação dos campos obrigatórios
+            if (string.IsNullOrWhiteSpace(txtNome.Text) ||
+                string.IsNullOrWhiteSpace(txtCpf.Text) ||
+                string.IsNullOrWhiteSpace(txtTelefone.Text) ||
+                string.IsNullOrWhiteSpace(txtQtd.Text) ||
+                string.IsNullOrWhiteSpace(txtDiarias.Text) ||
+                string.IsNullOrWhiteSpace(txtValorPago.Text) ||
+                txtFormaPag.SelectedItem == null
+                )
             {
-                MessageBox.Show(ctrlClientes.Salvar(oCliente.Clone()));
+                MessageBox.Show("Preencha todos os campos corretamente.", "Atenção", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
             }
-            else
+            //Validação dos campos numéricos
+            int diarias;
+            if (!int.TryParse(txtDiarias.Text, out diarias))
             {
-                var resp = MessageBox.Show("DESEJA EXCLUIR O CLIENTE DE ID: " + oCliente.IdCliente + "?", "CONFIRMAÇÃO", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
-                if (resp == DialogResult.Yes)
+                MessageBox.Show("Informe um número válido de diárias.", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                txtDiarias.Focus();
+                return;
+            }
+            int qtdPessoas;
+            if (!int.TryParse(txtQtd.Text, out qtdPessoas))
+            {
+                MessageBox.Show("Informe a quantidade de pessoas válida.", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                txtQtd.Focus();
+                return;
+            }
+            double valorPago;
+            if (!double.TryParse(txtValorPago.Text, out valorPago))
+            {
+                MessageBox.Show("Valor pago inválido.", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                txtValorPago.Focus();
+                return;
+            }
+            //Validação dos campos de datas
+            if (txtDataFim.Value < txtDataInicio.Value)
+            {
+                MessageBox.Show("A Data de Fim não pode ser menor que a Data de Início.", "Erro de Data", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+            //Se chegou aqui, os dados são válidos
+            try
+            {
+                oCliente.IdCliente = (txtId.Text == "" || txtId.Text == "0") ? 0 : Convert.ToInt32(txtId.Text);
+                oCliente.Nome = txtNome.Text;
+                oCliente.Cpf = txtCpf.Text;
+                oCliente.DataInicioReserva = txtDataInicio.Value;
+                oCliente.DataFimReserva = txtDataFim.Value;
+                oCliente.Diarias = diarias;
+                oCliente.QtdPessoas = qtdPessoas;
+                oCliente.Telefone = txtTelefone.Text;
+                oCliente.ValorPago = valorPago;
+                oCliente.FormaPagamento = txtFormaPag.Text;
+
+                // Verifica se um imóvel foi selecionado (importante para evitar erro de chave estrangeira)
+                if (oCliente.OImovel == null || oCliente.OImovel.IdImovel == 0)
                 {
-                    MessageBox.Show(ctrlClientes.Excluir(oCliente));
+                    // Tenta pegar do textbox caso o objeto não tenha sido preenchido, mas o ideal é garantir via objeto
+                    int idImovelTemp;
+                    if (int.TryParse(txtIdImovel.Text, out idImovelTemp) && idImovelTemp > 0)
+                    {
+                        oCliente.OImovel.IdImovel = idImovelTemp;
+                    }
+                    else
+                    {
+                        MessageBox.Show("Selecione um Imóvel antes de salvar.", "Atenção", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        return;
+                    }
                 }
+
+                if (this.btnSalvar.Text == "SALVAR")
+                {
+                    MessageBox.Show(ctrlClientes.Salvar(oCliente.Clone()));
+                }
+                else
+                {
+                    var resp = MessageBox.Show("DESEJA EXCLUIR O CLIENTE DE ID: " + oCliente.IdCliente + "?", "CONFIRMAÇÃO", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                    if (resp == DialogResult.Yes)
+                    {
+                        MessageBox.Show(ctrlClientes.Excluir(oCliente));
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Erro inesperado: " + ex.Message);
             }
         }
         public override void CarregaTxt()
@@ -55,8 +121,8 @@ namespace MeuBNB
             this.txtId.Text = oCliente.IdCliente.ToString();
             this.txtNome.Text = oCliente.Nome;
             this.txtCpf.Text = oCliente.Cpf;
-            this.txtDataInicio.Text = oCliente.DataInicioReserva.ToString("dd/MM/yyyy");
-            this.txtDataFim.Text = oCliente.DataFimReserva.ToString("dd/MM/yyyy");
+            this.txtDataInicio.Value = oCliente.DataInicioReserva;
+            this.txtDataFim.Value = oCliente.DataFimReserva;
             this.txtDiarias.Text = oCliente.Diarias.ToString();
             this.txtQtd.Text = oCliente.QtdPessoas.ToString();
             this.txtTelefone.Text = oCliente.Telefone;
@@ -118,7 +184,14 @@ namespace MeuBNB
             this.txtIdImovel.Text = oCliente.OImovel.IdImovel.ToString();
             this.txtDisponibilidade.SelectedItem = oCliente.OImovel.Disponibilidade;
             this.txtTipo.SelectedItem = oCliente.OImovel.TipoImovel;
-            this.txtValorPago.Text = Convert.ToString(oCliente.OImovel.ValorDiaria * oCliente.Diarias);
+
+            // LÓGICA DE CÁLCULO CORRIGIDA:
+            // 1. Obtém o número de diárias diretamente do TextBox (evitando valor 0 do objeto)
+            int numeroDiarias = 0;
+            int.TryParse(txtDiarias.Text, out numeroDiarias);
+            double total = oCliente.OImovel.ValorDiaria * numeroDiarias;
+            this.txtValorPago.Text = total.ToString("F2");
+
             oFrmConsImoveis.btnSair.Text = btnSair;
         }
     }

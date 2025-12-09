@@ -99,6 +99,7 @@
             this.txtNumero.Name = "txtNumero";
             this.txtNumero.Size = new System.Drawing.Size(294, 22);
             this.txtNumero.TabIndex = 11;
+            this.txtNumero.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.txtNumero_KeyPress);
             // 
             // txtCidade
             // 
@@ -153,6 +154,7 @@
             this.txtDespesas.Name = "txtDespesas";
             this.txtDespesas.Size = new System.Drawing.Size(294, 22);
             this.txtDespesas.TabIndex = 18;
+            this.txtDespesas.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.txtDespesas_KeyPress);
             // 
             // txtValor
             // 
@@ -162,6 +164,7 @@
             this.txtValor.Name = "txtValor";
             this.txtValor.Size = new System.Drawing.Size(294, 22);
             this.txtValor.TabIndex = 20;
+            this.txtValor.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.txtValorDiaria_KeyPress);
             // 
             // label9
             // 

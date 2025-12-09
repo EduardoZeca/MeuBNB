@@ -30,8 +30,6 @@
         {
             this.txtId = new System.Windows.Forms.TextBox();
             this.txtNome = new System.Windows.Forms.TextBox();
-            this.txtCpf = new System.Windows.Forms.TextBox();
-            this.txtTelefone = new System.Windows.Forms.TextBox();
             this.txtQtd = new System.Windows.Forms.TextBox();
             this.txtDiarias = new System.Windows.Forms.TextBox();
             this.txtDataInicio = new System.Windows.Forms.DateTimePicker();
@@ -54,6 +52,8 @@
             this.txtTipo = new System.Windows.Forms.ComboBox();
             this.txtIdImovel = new System.Windows.Forms.TextBox();
             this.btnBuscar = new System.Windows.Forms.Button();
+            this.txtCpf = new System.Windows.Forms.MaskedTextBox();
+            this.txtTelefone = new System.Windows.Forms.MaskedTextBox();
             this.SuspendLayout();
             // 
             // txtId
@@ -72,24 +72,6 @@
             this.txtNome.Name = "txtNome";
             this.txtNome.Size = new System.Drawing.Size(374, 22);
             this.txtNome.TabIndex = 6;
-            // 
-            // txtCpf
-            // 
-            this.txtCpf.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper;
-            this.txtCpf.Location = new System.Drawing.Point(674, 71);
-            this.txtCpf.MaxLength = 14;
-            this.txtCpf.Name = "txtCpf";
-            this.txtCpf.Size = new System.Drawing.Size(226, 22);
-            this.txtCpf.TabIndex = 7;
-            // 
-            // txtTelefone
-            // 
-            this.txtTelefone.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper;
-            this.txtTelefone.Location = new System.Drawing.Point(906, 71);
-            this.txtTelefone.MaxLength = 20;
-            this.txtTelefone.Name = "txtTelefone";
-            this.txtTelefone.Size = new System.Drawing.Size(226, 22);
-            this.txtTelefone.TabIndex = 8;
             // 
             // txtQtd
             // 
@@ -204,7 +186,7 @@
             // label9
             // 
             this.label9.AutoSize = true;
-            this.label9.Location = new System.Drawing.Point(906, 52);
+            this.label9.Location = new System.Drawing.Point(905, 52);
             this.label9.Name = "label9";
             this.label9.Size = new System.Drawing.Size(78, 16);
             this.label9.TabIndex = 22;
@@ -213,7 +195,7 @@
             // label10
             // 
             this.label10.AutoSize = true;
-            this.label10.Location = new System.Drawing.Point(676, 52);
+            this.label10.Location = new System.Drawing.Point(674, 53);
             this.label10.Name = "label10";
             this.label10.Size = new System.Drawing.Size(33, 16);
             this.label10.TabIndex = 23;
@@ -303,10 +285,30 @@
             this.btnBuscar.UseVisualStyleBackColor = true;
             this.btnBuscar.Click += new System.EventHandler(this.btnBuscar_Click);
             // 
+            // txtCpf
+            // 
+            this.txtCpf.Culture = new System.Globalization.CultureInfo("pt-BR");
+            this.txtCpf.Location = new System.Drawing.Point(674, 71);
+            this.txtCpf.Mask = "000.000.000-00";
+            this.txtCpf.Name = "txtCpf";
+            this.txtCpf.Size = new System.Drawing.Size(226, 22);
+            this.txtCpf.TabIndex = 32;
+            // 
+            // txtTelefone
+            // 
+            this.txtTelefone.Culture = new System.Globalization.CultureInfo("pt-BR");
+            this.txtTelefone.Location = new System.Drawing.Point(906, 71);
+            this.txtTelefone.Mask = "(+00) 00 00000-0000";
+            this.txtTelefone.Name = "txtTelefone";
+            this.txtTelefone.Size = new System.Drawing.Size(226, 22);
+            this.txtTelefone.TabIndex = 33;
+            // 
             // frmCadClientes
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.ClientSize = new System.Drawing.Size(1482, 733);
+            this.Controls.Add(this.txtTelefone);
+            this.Controls.Add(this.txtCpf);
             this.Controls.Add(this.btnBuscar);
             this.Controls.Add(this.txtIdImovel);
             this.Controls.Add(this.txtTipo);
@@ -329,8 +331,6 @@
             this.Controls.Add(this.txtDataInicio);
             this.Controls.Add(this.txtDiarias);
             this.Controls.Add(this.txtQtd);
-            this.Controls.Add(this.txtTelefone);
-            this.Controls.Add(this.txtCpf);
             this.Controls.Add(this.txtNome);
             this.Controls.Add(this.txtId);
             this.Name = "frmCadClientes";
@@ -340,8 +340,6 @@
             this.Controls.SetChildIndex(this.btnSalvar, 0);
             this.Controls.SetChildIndex(this.txtId, 0);
             this.Controls.SetChildIndex(this.txtNome, 0);
-            this.Controls.SetChildIndex(this.txtCpf, 0);
-            this.Controls.SetChildIndex(this.txtTelefone, 0);
             this.Controls.SetChildIndex(this.txtQtd, 0);
             this.Controls.SetChildIndex(this.txtDiarias, 0);
             this.Controls.SetChildIndex(this.txtDataInicio, 0);
@@ -364,6 +362,8 @@
             this.Controls.SetChildIndex(this.txtTipo, 0);
             this.Controls.SetChildIndex(this.txtIdImovel, 0);
             this.Controls.SetChildIndex(this.btnBuscar, 0);
+            this.Controls.SetChildIndex(this.txtCpf, 0);
+            this.Controls.SetChildIndex(this.txtTelefone, 0);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -373,8 +373,6 @@
 
         private System.Windows.Forms.TextBox txtId;
         private System.Windows.Forms.TextBox txtNome;
-        private System.Windows.Forms.TextBox txtCpf;
-        private System.Windows.Forms.TextBox txtTelefone;
         private System.Windows.Forms.TextBox txtQtd;
         private System.Windows.Forms.TextBox txtDiarias;
         private System.Windows.Forms.DateTimePicker txtDataInicio;
@@ -397,5 +395,7 @@
         private System.Windows.Forms.ComboBox txtTipo;
         private System.Windows.Forms.TextBox txtIdImovel;
         private System.Windows.Forms.Button btnBuscar;
+        private System.Windows.Forms.MaskedTextBox txtCpf;
+        private System.Windows.Forms.MaskedTextBox txtTelefone;
     }
 }
