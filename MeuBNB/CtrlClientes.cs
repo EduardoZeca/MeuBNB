@@ -32,9 +32,9 @@ namespace MeuBNB
         {
             return aDao.CarregaObj(chave);
         }
-        public override List<Clientes> Pesquisar(string chave)
+        public override List<Clientes> Pesquisar(string chave, string filtro)
         {
-            return aDao.Pesquisar(chave);
+            return aDao.Pesquisar(chave, filtro);
         }
     }
 }

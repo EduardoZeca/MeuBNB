@@ -81,6 +81,7 @@
             this.txtQtd.Name = "txtQtd";
             this.txtQtd.Size = new System.Drawing.Size(100, 22);
             this.txtQtd.TabIndex = 9;
+            this.txtQtd.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.txtQtd_KeyPress);
             // 
             // txtDiarias
             // 
@@ -90,6 +91,7 @@
             this.txtDiarias.Name = "txtDiarias";
             this.txtDiarias.Size = new System.Drawing.Size(100, 22);
             this.txtDiarias.TabIndex = 10;
+            this.txtDiarias.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.txtDiarias_KeyPress);
             // 
             // txtDataInicio
             // 
@@ -119,6 +121,8 @@
             this.txtValorPago.Name = "txtValorPago";
             this.txtValorPago.Size = new System.Drawing.Size(100, 22);
             this.txtValorPago.TabIndex = 13;
+            this.txtValorPago.Enter += new System.EventHandler(this.TextBoxMoeda_Enter);
+            this.txtValorPago.Leave += new System.EventHandler(this.TextBoxMoeda_Leave);
             // 
             // label2
             // 

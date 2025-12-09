@@ -25,7 +25,7 @@ namespace MeuBNB
         {
             return null;
         }
-        public virtual List<T> Pesquisar(string chave)
+        public virtual List<T> Pesquisar(string chave, string filtro)
         {
             return null;
         }

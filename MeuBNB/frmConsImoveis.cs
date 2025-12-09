@@ -11,13 +11,15 @@ namespace MeuBNB
     public partial class frmConsImoveis : MeuBNB.frmCons
     {
         frmCadImoveis ofrmCad;
-        Interfaces inter;
         Imoveis oImovel;
+        Imoveis imovelSelecionado;
         CtrlImoveis aCtrlImovel;
         public frmConsImoveis()
         {
             InitializeComponent();
+            cbFiltro.SelectedIndex = 0; //"GERAL" por padrão
         }
+        public Imoveis ImovelSelecionado { get; private set; }
         protected override void Incluir()
         {
             ofrmCad.ConhecaObj(oImovel, aCtrlImovel);
@@ -56,40 +58,29 @@ namespace MeuBNB
         }
         protected override void CarregaLV(string chave)
         {
-            if(chave == "")
-            {
-                listV.Items.Clear();
-                foreach (Imoveis imovel in aCtrlImovel.Listar())
-                {
-                    ListViewItem item = new ListViewItem(imovel.IdImovel.ToString());
-                    item.SubItems.Add(imovel.Rua);
-                    item.SubItems.Add(imovel.Bairro);
-                    item.SubItems.Add(imovel.Numero.ToString());
-                    item.SubItems.Add(imovel.Cidade);
-                    item.SubItems.Add(imovel.Disponibilidade);
-                    item.SubItems.Add(imovel.ValorDiaria.ToString("F2"));
-                    item.SubItems.Add(imovel.Despesas.ToString("F2"));
-                    item.SubItems.Add(imovel.TipoImovel);
-                    item.Tag = imovel;
-                    listV.Items.Add(item);
-                }
-            }
+            listV.Items.Clear();
+            List<Imoveis> listaResultados;
+            
+            if (string.IsNullOrEmpty(chave))
+                listaResultados = aCtrlImovel.Listar();
             else
             {
-                listV.Items.Clear();
-                foreach (Imoveis imovel in aCtrlImovel.Pesquisar(chave))
-                {
-                    ListViewItem item = new ListViewItem(imovel.IdImovel.ToString());
-                    item.SubItems.Add(imovel.Rua);
-                    item.SubItems.Add(imovel.Bairro);
-                    item.SubItems.Add(imovel.Numero.ToString());
-                    item.SubItems.Add(imovel.Cidade);
-                    item.SubItems.Add(imovel.Disponibilidade);
-                    item.SubItems.Add(imovel.ValorDiaria.ToString("F2"));
-                    item.SubItems.Add(imovel.Despesas.ToString("F2"));
-                    item.SubItems.Add(imovel.TipoImovel);
-                    listV.Items.Add(item);
-                }
+                string filtro = cbFiltro.Text;
+                listaResultados = aCtrlImovel.Pesquisar(chave, filtro);
+            }
+            foreach (Imoveis imovel in listaResultados)
+            {
+                ListViewItem item = new ListViewItem(imovel.IdImovel.ToString());
+                item.SubItems.Add(imovel.Rua);
+                item.SubItems.Add(imovel.Bairro);
+                item.SubItems.Add(imovel.Numero.ToString());
+                item.SubItems.Add(imovel.Cidade);
+                item.SubItems.Add(imovel.Disponibilidade);
+                item.SubItems.Add(imovel.ValorDiaria.ToString("F2"));
+                item.SubItems.Add(imovel.Despesas.ToString("F2"));
+                item.SubItems.Add(imovel.TipoImovel);
+                item.Tag = imovel;
+                listV.Items.Add(item);
             }
         }
         public override void ConhecaObj(object obj, object ctrl)
@@ -105,25 +96,39 @@ namespace MeuBNB
             if(obj != null)
                 ofrmCad = (frmCadImoveis)obj;
         }
-        private void cONSULTARCLIENTESToolStripMenuItem_Click(object sender, EventArgs e)
+        //Ao ser acessado pelo frmCadClientes para selecionar um imóvel
+        public void ConfigurarModoSelecao(bool ativo)
         {
-            inter.MostraClientes(oImovel, aCtrlImovel);
+            // Esconde/Mostra botões de CRUD
+            btnIncluir.Visible = !ativo;
+            btnAlterar.Visible = !ativo;
+            btnExcluir.Visible = !ativo;
+
+            // Muda o texto do botão de sair
+            btnSair.Text = ativo ? "SELECIONAR" : "SAIR";
+
+            // Limpa seleção anterior
+            if (ativo) ImovelSelecionado = null;
         }
         private void listV_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if(this.listV.SelectedItems.Count > 0)
+            if (this.listV.SelectedItems.Count > 0)
             {
-                ListViewItem item = this.listV.SelectedItems[0];
-                Imoveis imovel = (Imoveis)item.Tag;
-                oImovel.IdImovel = imovel.IdImovel;
-                oImovel.Rua = imovel.Rua;
-                oImovel.Numero = imovel.Numero;
-                oImovel.Bairro = imovel.Bairro;
-                oImovel.Cidade = imovel.Cidade;
-                oImovel.Disponibilidade = imovel.Disponibilidade;
-                oImovel.ValorDiaria = imovel.ValorDiaria;
-                oImovel.Despesas = imovel.Despesas;
-                oImovel.TipoImovel = imovel.TipoImovel;
+                // Recupera o objeto completo da Tag do item (preenchido no CarregaLV)
+                Imoveis imovelDaLista = (Imoveis)this.listV.SelectedItems[0].Tag;
+                this.ImovelSelecionado = imovelDaLista;
+                if (oImovel != null)
+                {
+                    oImovel.IdImovel = imovelDaLista.IdImovel;
+                    oImovel.Rua = imovelDaLista.Rua;
+                    oImovel.Numero = imovelDaLista.Numero;
+                    oImovel.Bairro = imovelDaLista.Bairro;
+                    oImovel.Cidade = imovelDaLista.Cidade;
+                    oImovel.Disponibilidade = imovelDaLista.Disponibilidade;
+                    oImovel.ValorDiaria = imovelDaLista.ValorDiaria;
+                    oImovel.Despesas = imovelDaLista.Despesas;
+                    oImovel.TipoImovel = imovelDaLista.TipoImovel;
+                }
             }
         }
     }

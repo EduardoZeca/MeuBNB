@@ -54,6 +54,17 @@
             this.listV.Location = new System.Drawing.Point(12, 100);
             this.listV.SelectedIndexChanged += new System.EventHandler(this.listV_SelectedIndexChanged);
             // 
+            // cbFiltro
+            // 
+            this.cbFiltro.Items.AddRange(new object[] {
+            "GERAL",
+            "NOME",
+            "CPF",
+            "TELEFONE",
+            "INICIO RESERVA",
+            "VALOR PAGO",
+            "FORMA DE PAGAMENTO"});
+            // 
             // colNome
             // 
             this.colNome.Text = "NOME";

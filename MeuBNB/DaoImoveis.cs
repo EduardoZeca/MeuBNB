@@ -13,7 +13,7 @@ namespace MeuBNB
         public override string Salvar(object obj)
         {
             Imoveis oImovel = (Imoveis)obj;
-            string sql = "";
+            string sql;
             if (oImovel.IdImovel == 0)
             {
                 sql = "insert into imoveis(rua, numero, bairro, cidade, disponibilidade, valorDiaria, despesas, tipoImovel) " +
@@ -39,13 +39,25 @@ namespace MeuBNB
                     cmd.Parameters.AddWithValue("@despesas", oImovel.Despesas);
                     cmd.Parameters.AddWithValue("@tipoImovel", oImovel.TipoImovel);
                     cmd.ExecuteNonQuery();
-                    cmd.CommandText = "select @@identity";
-                    return "Imóvel salvo com sucesso! ID: " + cmd.ExecuteScalar().ToString();
+                    //Se for insert, retorna o ID gerado, senão apenas sucesso
+                    if (oImovel.IdImovel == 0)
+                    {
+                        cmd.CommandText = "select @@identity";
+                        return "Imóvel cadastrado com sucesso! ID: " + cmd.ExecuteScalar().ToString();
+                    }
+                    else
+                    {
+                        return "Imóvel atualizado com sucesso!";
+                    }
                 }
             }
-            catch (Exception e)
+            catch (SqlException ex)
             {
-                return "Erro ao salvar: " + e.Message;
+                //Violação de chave única/duplicada 
+                if (ex.Number == 2627 || ex.Number == 2601)
+                    throw new Exception("Já existe um imóvel cadastrado com esses dados principais.");
+
+                throw new Exception("Erro no banco de dados: " + ex.Message);
             }
         }
         public override string Excluir(object obj)
@@ -54,28 +66,57 @@ namespace MeuBNB
             string sql = "delete from imoveis where idImovel = @idImovel";
             try
             {
-                using(SqlCommand cmd = new SqlCommand(sql, cnn))
+                using (SqlCommand cmd = new SqlCommand(sql, cnn))
                 {
                     cmd.Parameters.AddWithValue("@idImovel", oImovel.IdImovel);
                     cmd.ExecuteNonQuery();
                 }
-                return "Imovel de ID: " + oImovel.IdImovel + " Excluido com sucesso!";
+                return "Imóvel excluído com sucesso!";
             }
-            catch (Exception e)
+            catch (SqlException ex)
             {
-                return "Não foi possivel excluir. Erro: " + e.Message;
+                // Erro 547: Violação de Constraint (FK) - Tentativa de excluir pai com filhos
+                if (ex.Number == 547)
+                    throw new Exception("Não é possível excluir este imóvel pois existem Clientes vinculados a ele.");
+
+                throw new Exception("Não foi possível excluir o imóvel. Detalhes: " + ex.Message);
             }
         }
-        public override List<Imoveis> Pesquisar(string chave)
+        public override List<Imoveis> Pesquisar(string chave, string filtro)
         {
-            string sql = "select * from imoveis where rua like @chave or bairro like @chave or cidade like @chave or idImovel like @chave or disponibilidade like @chave or tipoImovel like @chave order by idImovel";
+            string sql = "select * from imoveis where ";
+            // Monta o SQL dinâmico baseado no filtro seguro (evita SQL Injection via concatenação direta)
+            switch (filtro)
+            {
+                case "RUA":
+                    sql += "rua like @chave";
+                    break;
+                case "BAIRRO":
+                    sql += "bairro like @chave";
+                    break;
+                case "CIDADE":
+                    sql += "cidade like @chave";
+                    break;
+                case "TIPO":
+                    sql += "tipoImovel like @chave";
+                    break;
+                case "DISPONIBILIDADE":
+                    sql += "disponibilidade like @chave";
+                    break;
+                default: // "GERAL" ou vazio
+                    sql += "idImovel like @chave";
+                    break;
+            }
+            sql += " order by idImovel";
             try
             {
-                using(SqlCommand cmd = new SqlCommand(sql, cnn))
+                using (SqlCommand cmd = new SqlCommand(sql, cnn))
                 {
                     cmd.Parameters.AddWithValue("@chave", "%" + chave + "%");
+
                     SqlDataReader reader = cmd.ExecuteReader();
                     List<Imoveis> list = new List<Imoveis>();
+
                     while (reader.Read())
                     {
                         Imoveis oImovel = new Imoveis(
@@ -95,7 +136,7 @@ namespace MeuBNB
                     return list;
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return null;
             }

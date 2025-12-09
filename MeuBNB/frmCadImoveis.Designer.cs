@@ -154,7 +154,9 @@
             this.txtDespesas.Name = "txtDespesas";
             this.txtDespesas.Size = new System.Drawing.Size(294, 22);
             this.txtDespesas.TabIndex = 18;
+            this.txtDespesas.Enter += new System.EventHandler(this.TextBoxMoeda_Enter);
             this.txtDespesas.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.txtDespesas_KeyPress);
+            this.txtDespesas.Leave += new System.EventHandler(this.TextBoxMoeda_Leave);
             // 
             // txtValor
             // 
@@ -164,7 +166,9 @@
             this.txtValor.Name = "txtValor";
             this.txtValor.Size = new System.Drawing.Size(294, 22);
             this.txtValor.TabIndex = 20;
+            this.txtValor.Enter += new System.EventHandler(this.TextBoxMoeda_Enter);
             this.txtValor.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.txtValorDiaria_KeyPress);
+            this.txtValor.Leave += new System.EventHandler(this.TextBoxMoeda_Leave);
             // 
             // label9
             // 

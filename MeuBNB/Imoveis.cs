@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace MeuBNB
 {
-    internal class Imoveis
+    public class Imoveis
     {
         int idImovel;
         string rua;

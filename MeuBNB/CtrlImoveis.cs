@@ -29,9 +29,9 @@ namespace MeuBNB
         {
             return aDAO.CarregaObj(chave);
         }
-        public override List<Imoveis> Pesquisar(string chave)
+        public override List<Imoveis> Pesquisar(string chave, string filtro)
         {
-            return aDAO.Pesquisar(chave);
+            return aDAO.Pesquisar(chave, filtro);
         }
     }
 }

@@ -56,10 +56,9 @@ namespace MeuBNB
                 return;
             }
             double valorPago;
-            if (!double.TryParse(txtValorPago.Text, out valorPago))
+            if (!double.TryParse(txtValorPago.Text, System.Globalization.NumberStyles.Currency, null, out valorPago))
             {
                 MessageBox.Show("Valor pago inválido.", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                txtValorPago.Focus();
                 return;
             }
             //Validação dos campos de datas
@@ -177,22 +176,65 @@ namespace MeuBNB
         }
         private void btnBuscar_Click(object sender, EventArgs e)
         {
-            string btnSair = oFrmConsImoveis.btnSair.Text;
-            oFrmConsImoveis.btnSair.Text = "SELECIONAR";
-            oFrmConsImoveis.ConhecaObj(oCliente.OImovel, ctrlClientes.CtrlImoveis);
-            oFrmConsImoveis.ShowDialog();
-            this.txtIdImovel.Text = oCliente.OImovel.IdImovel.ToString();
-            this.txtDisponibilidade.SelectedItem = oCliente.OImovel.Disponibilidade;
-            this.txtTipo.SelectedItem = oCliente.OImovel.TipoImovel;
+            try
+            {
+                oFrmConsImoveis.ConfigurarModoSelecao(true);
+                oFrmConsImoveis.ConhecaObj(null, ctrlClientes.CtrlImoveis);
+                oFrmConsImoveis.ShowDialog();
+                //Verifica se algo foi selecionado ao voltar
+                if (oFrmConsImoveis.ImovelSelecionado != null)
+                {
+                    // Clona o objeto para garantir segurança da referência
+                    oCliente.OImovel = oFrmConsImoveis.ImovelSelecionado.Clone();
+                    
+                    this.txtIdImovel.Text = oCliente.OImovel.IdImovel.ToString();
+                    this.txtDisponibilidade.SelectedItem = oCliente.OImovel.Disponibilidade;
+                    this.txtTipo.SelectedItem = oCliente.OImovel.TipoImovel;
 
-            // LÓGICA DE CÁLCULO CORRIGIDA:
-            // 1. Obtém o número de diárias diretamente do TextBox (evitando valor 0 do objeto)
-            int numeroDiarias = 0;
-            int.TryParse(txtDiarias.Text, out numeroDiarias);
-            double total = oCliente.OImovel.ValorDiaria * numeroDiarias;
-            this.txtValorPago.Text = total.ToString("F2");
+                    int numeroDiarias = 0;
+                    int.TryParse(txtDiarias.Text, out numeroDiarias);
 
-            oFrmConsImoveis.btnSair.Text = btnSair;
+                    double total = oCliente.OImovel.ValorDiaria * numeroDiarias;
+                    this.txtValorPago.Text = total.ToString("C2");
+                }
+            }
+            finally
+            {
+                oFrmConsImoveis.ConfigurarModoSelecao(false);
+            }
+        }
+        // Remove a formatação para facilitar a edição (R$ 1.000,00 -> 1000,00)
+        private void TextBoxMoeda_Enter(object sender, EventArgs e)
+        {
+            TextBox txt = sender as TextBox;
+            if (!string.IsNullOrEmpty(txt.Text))
+            {
+                string valorLimpo = txt.Text.Replace("R$", "").Trim();
+                txt.Text = valorLimpo;
+            }
+        }
+        // Aplica a formatação de moeda (1000,00 -> R$ 1.000,00)
+        private void TextBoxMoeda_Leave(object sender, EventArgs e)
+        {
+            TextBox txt = sender as TextBox;
+            if (double.TryParse(txt.Text.Replace("R$", "").Trim(), out double valor))
+                txt.Text = valor.ToString("C2");
+            else
+                txt.Text = "R$ 0,00";
+        }
+        private void txtQtd_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (!char.IsDigit(e.KeyChar) && e.KeyChar != (char)8)
+            {
+                e.Handled = true;
+            }
+        }
+        private void txtDiarias_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (!char.IsDigit(e.KeyChar) && e.KeyChar != (char)8)
+            {
+                e.Handled = true;
+            }
         }
     }
 }

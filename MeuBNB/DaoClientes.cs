@@ -12,8 +12,8 @@ namespace MeuBNB
         public override string Salvar(object obj)
         {
             Clientes cliente = (Clientes)obj;
-            string sql = "";
-            if(cliente.IdCliente == 0)
+            string sql;
+            if (cliente.IdCliente == 0)
                 sql = "insert into clientes(nome, cpf, telefone, diarias, qtdPessoas, dataInicioReserva, dataFimReserva, valorPago, formaPagamento, idImovel) values (@nome, @cpf, @telefone, @diarias, @qtdPessoas, @dataInicioReserva, @dataFimReserva, @valorPago, @formaPagamento, @idImovel)";
             else
                 sql = "update clientes set nome=@nome, cpf=@cpf, telefone=@telefone, diarias=@diarias, qtdPessoas=@qtdPessoas, dataInicioReserva=@dataInicioReserva, dataFimReserva=@dataFimReserva, valorPago=@valorPago, formaPagamento=@formaPagamento, idImovel=@idImovel where idCliente=@idCliente";
@@ -33,13 +33,23 @@ namespace MeuBNB
                     cmd.Parameters.AddWithValue("@formaPagamento", cliente.FormaPagamento);
                     cmd.Parameters.AddWithValue("@idImovel", cliente.OImovel.IdImovel);
                     cmd.ExecuteNonQuery();
-                    cmd.CommandText = "select @@identity";
-                    return "Cliente salvo com sucesso! ID: " + cmd.ExecuteScalar().ToString();
+                    if (cliente.IdCliente == 0)
+                    {
+                        cmd.CommandText = "select @@identity";
+                        return "Cliente salvo com sucesso! ID: " + cmd.ExecuteScalar().ToString();
+                    }
+                    else
+                    {
+                        return "Dados do cliente atualizados com sucesso!";
+                    }
                 }
             }
-            catch (Exception e)
+            catch (SqlException ex)
             {
-                return "Erro ao salvar: " + e.Message;
+                if (ex.Number == 547) // Erro de chave estrangeira (Imóvel inexistente)
+                    throw new Exception("O Imóvel selecionado não existe ou é inválido.");
+
+                throw new Exception("Erro ao salvar cliente: " + ex.Message);
             }
         }
         public override string Excluir(object obj)
@@ -55,9 +65,9 @@ namespace MeuBNB
                     return "Cliente excluído com sucesso!";
                 }
             }
-            catch (Exception e)
+            catch (SqlException ex)
             {
-                return "Erro ao excluir: " + e.Message;
+                throw new Exception("Erro ao excluir cliente: " + ex.Message);
             }
         }
         public override List<Clientes> Listar()
@@ -153,9 +163,35 @@ namespace MeuBNB
                 return ex.Message;
             }
         }
-        public override List<Clientes> Pesquisar(string chave)
+        public override List<Clientes> Pesquisar(string chave, string filtro)
         {
-            string sql = "select * from clientes as c inner join imoveis as i on i.idImovel = c.idImovel where c.nome like @chave or c.cpf like @chave or c.IdCliente like @chave or c.idImovel like @chave or @dataInicioReserva like @chave or @dataFimReserva like @chave or telefone like @chave order by c.idCliente";
+            string sql = "select * from clientes as c inner join imoveis as i on i.idImovel = c.idImovel where ";
+            switch (filtro)
+            {
+                case "NOME":
+                    sql += "c.nome like @chave";
+                    break;
+                case "CPF":
+                    sql += "c.cpf like @chave";
+                    break;
+                case "TELEFONE":
+                    sql += "c.telefone like @chave";
+                    break;
+                case "INICIO RESERVA":
+                    // Converte a data para texto (dd/mm/aaaa) para permitir busca com LIKE
+                    sql += "CONVERT(varchar, c.dataInicioReserva, 103) like @chave";
+                    break;
+                case "VALOR PAGO":
+                    sql += "c.valorPago like @chave";
+                    break;
+                case "FORMA PAGAMENTO":
+                    sql += "c.formaPagamento like @chave";
+                    break;
+                default: 
+                    sql += "(c.idCliente like @chave or c.idImovel like @chave)";
+                    break;
+            }
+            sql += " order by c.idCliente";
             try
             {
                 using (SqlCommand cmd = new SqlCommand(sql, cnn))
@@ -195,7 +231,7 @@ namespace MeuBNB
                     return list;
                 }
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return null;
             }

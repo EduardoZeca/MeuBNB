@@ -51,6 +51,16 @@
             this.colTipo});
             this.listV.SelectedIndexChanged += new System.EventHandler(this.listV_SelectedIndexChanged);
             // 
+            // cbFiltro
+            // 
+            this.cbFiltro.Items.AddRange(new object[] {
+            "GERAL",
+            "RUA",
+            "BAIRRO",
+            "CIDADE",
+            "DISPONIBILIDADE",
+            "TIPO"});
+            // 
             // colRua
             // 
             this.colRua.Text = "RUA";

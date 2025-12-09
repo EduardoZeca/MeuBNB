@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace MeuBNB
 {
-    internal class Clientes
+    public class Clientes
     {
         int idCliente;
         string nome;

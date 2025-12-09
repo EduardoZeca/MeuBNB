@@ -30,11 +30,12 @@
         {
             this.listV = new System.Windows.Forms.ListView();
             this.colID = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.txtPesquisa = new System.Windows.Forms.TextBox();
             this.btnExcluir = new System.Windows.Forms.Button();
             this.btnAlterar = new System.Windows.Forms.Button();
             this.btnIncluir = new System.Windows.Forms.Button();
             this.btnPesquisar = new System.Windows.Forms.Button();
+            this.txtPesquisa = new System.Windows.Forms.TextBox();
+            this.cbFiltro = new System.Windows.Forms.ComboBox();
             this.SuspendLayout();
             // 
             // btnSair
@@ -58,14 +59,6 @@
             // colID
             // 
             this.colID.Text = "ID";
-            // 
-            // txtPesquisa
-            // 
-            this.txtPesquisa.Location = new System.Drawing.Point(12, 51);
-            this.txtPesquisa.Multiline = true;
-            this.txtPesquisa.Name = "txtPesquisa";
-            this.txtPesquisa.Size = new System.Drawing.Size(462, 30);
-            this.txtPesquisa.TabIndex = 2;
             // 
             // btnExcluir
             // 
@@ -99,7 +92,7 @@
             // 
             // btnPesquisar
             // 
-            this.btnPesquisar.Location = new System.Drawing.Point(480, 51);
+            this.btnPesquisar.Location = new System.Drawing.Point(644, 53);
             this.btnPesquisar.Name = "btnPesquisar";
             this.btnPesquisar.Size = new System.Drawing.Size(151, 30);
             this.btnPesquisar.TabIndex = 7;
@@ -107,10 +100,28 @@
             this.btnPesquisar.UseVisualStyleBackColor = true;
             this.btnPesquisar.Click += new System.EventHandler(this.btnPesquisar_Click);
             // 
+            // txtPesquisa
+            // 
+            this.txtPesquisa.Location = new System.Drawing.Point(12, 51);
+            this.txtPesquisa.Multiline = true;
+            this.txtPesquisa.Name = "txtPesquisa";
+            this.txtPesquisa.Size = new System.Drawing.Size(462, 30);
+            this.txtPesquisa.TabIndex = 2;
+            // 
+            // cbFiltro
+            // 
+            this.cbFiltro.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cbFiltro.FormattingEnabled = true;
+            this.cbFiltro.Location = new System.Drawing.Point(480, 55);
+            this.cbFiltro.Name = "cbFiltro";
+            this.cbFiltro.Size = new System.Drawing.Size(158, 24);
+            this.cbFiltro.TabIndex = 8;
+            // 
             // frmCons
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.ClientSize = new System.Drawing.Size(1482, 728);
+            this.Controls.Add(this.cbFiltro);
             this.Controls.Add(this.btnPesquisar);
             this.Controls.Add(this.btnIncluir);
             this.Controls.Add(this.btnAlterar);
@@ -118,13 +129,14 @@
             this.Controls.Add(this.txtPesquisa);
             this.Controls.Add(this.listV);
             this.Name = "frmCons";
-            this.Controls.SetChildIndex(this.btnSair, 0);
             this.Controls.SetChildIndex(this.listV, 0);
             this.Controls.SetChildIndex(this.txtPesquisa, 0);
             this.Controls.SetChildIndex(this.btnExcluir, 0);
             this.Controls.SetChildIndex(this.btnAlterar, 0);
             this.Controls.SetChildIndex(this.btnIncluir, 0);
             this.Controls.SetChildIndex(this.btnPesquisar, 0);
+            this.Controls.SetChildIndex(this.btnSair, 0);
+            this.Controls.SetChildIndex(this.cbFiltro, 0);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -136,7 +148,8 @@
         public System.Windows.Forms.Button btnExcluir;
         public System.Windows.Forms.Button btnAlterar;
         public System.Windows.Forms.Button btnIncluir;
-        public System.Windows.Forms.TextBox txtPesquisa;
         public System.Windows.Forms.ListView listV;
+        public System.Windows.Forms.TextBox txtPesquisa;
+        public System.Windows.Forms.ComboBox cbFiltro;
     }
 }

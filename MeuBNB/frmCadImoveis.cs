@@ -160,5 +160,24 @@ namespace MeuBNB
                 e.Handled = true;
             }
         }
+        // Remove a formatação para facilitar a edição (R$ 1.000,00 -> 1000,00)
+        private void TextBoxMoeda_Enter(object sender, EventArgs e)
+        {
+            TextBox txt = sender as TextBox;
+            if (!string.IsNullOrEmpty(txt.Text))
+            {
+                string valorLimpo = txt.Text.Replace("R$", "").Trim();
+                txt.Text = valorLimpo;
+            }
+        }
+        // Aplica a formatação de moeda (1000,00 -> R$ 1.000,00)
+        private void TextBoxMoeda_Leave(object sender, EventArgs e)
+        {
+            TextBox txt = sender as TextBox;
+            if (double.TryParse(txt.Text.Replace("R$", "").Trim(), out double valor))
+                txt.Text = valor.ToString("C2");
+            else
+                txt.Text = "R$ 0,00";
+        }
     }
 }

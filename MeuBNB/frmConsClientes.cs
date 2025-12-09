@@ -16,6 +16,7 @@ namespace MeuBNB
         public frmConsClientes()
         {
             InitializeComponent();
+            cbFiltro.SelectedIndex = 0; //"GERAL" por padrão
         }
         protected override void Incluir()
         {
@@ -69,40 +70,29 @@ namespace MeuBNB
         protected override void CarregaLV(string chave)
         {
             listV.Items.Clear();
-            if (chave == "")
-            {
-                foreach (Clientes ocliente in ctrlClientes.Listar())
-                {
-                    ListViewItem item = new ListViewItem(ocliente.IdCliente.ToString());
-                    item.SubItems.Add(ocliente.Nome);
-                    item.SubItems.Add(ocliente.Cpf);
-                    item.SubItems.Add(ocliente.Telefone);
-                    item.SubItems.Add(ocliente.Diarias.ToString());
-                    item.SubItems.Add(ocliente.DataInicioReserva.ToString());
-                    item.SubItems.Add(ocliente.DataFimReserva.ToString());
-                    item.SubItems.Add(ocliente.QtdPessoas.ToString());
-                    item.SubItems.Add(ocliente.ValorPago.ToString("F2"));
-                    item.SubItems.Add(ocliente.FormaPagamento);
-                    item.Tag = ocliente;
-                    listV.Items.Add(item);
-                }
-            }
+            List<Clientes> listaClientes;
+            if (string.IsNullOrEmpty(chave))
+                listaClientes = ctrlClientes.Listar();
             else
             {
-                foreach (Clientes ocliente in ctrlClientes.Pesquisar(chave))
-                {
-                    ListViewItem item = new ListViewItem(ocliente.IdCliente.ToString());
-                    item.SubItems.Add(ocliente.Nome);
-                    item.SubItems.Add(ocliente.Cpf);
-                    item.SubItems.Add(ocliente.Telefone);
-                    item.SubItems.Add(ocliente.Diarias.ToString());
-                    item.SubItems.Add(ocliente.DataInicioReserva.ToString());
-                    item.SubItems.Add(ocliente.DataFimReserva.ToString());
-                    item.SubItems.Add(ocliente.QtdPessoas.ToString());
-                    item.SubItems.Add(ocliente.ValorPago.ToString("F2"));
-                    item.SubItems.Add(ocliente.FormaPagamento);
-                    listV.Items.Add(item);
-                }
+                string filtro = cbFiltro.SelectedItem.ToString();
+                listaClientes = ctrlClientes.Pesquisar(chave, filtro);
+            }
+
+            foreach (Clientes ocliente in listaClientes)
+            {
+                ListViewItem item = new ListViewItem(ocliente.IdCliente.ToString());
+                item.SubItems.Add(ocliente.Nome);
+                item.SubItems.Add(ocliente.Cpf);
+                item.SubItems.Add(ocliente.Telefone);
+                item.SubItems.Add(ocliente.Diarias.ToString());
+                item.SubItems.Add(ocliente.DataInicioReserva.ToString());
+                item.SubItems.Add(ocliente.DataFimReserva.ToString());
+                item.SubItems.Add(ocliente.QtdPessoas.ToString());
+                item.SubItems.Add(ocliente.ValorPago.ToString("F2"));
+                item.SubItems.Add(ocliente.FormaPagamento);
+                item.Tag = ocliente;
+                listV.Items.Add(item);
             }
         }
         private void listV_SelectedIndexChanged(object sender, EventArgs e)
