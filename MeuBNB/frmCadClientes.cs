@@ -17,6 +17,10 @@ namespace MeuBNB
         public frmCadClientes()
         {
             InitializeComponent();
+            txtDataInicio.MinDate = new DateTime(1900, 1, 1);
+            txtDataInicio.MaxDate = new DateTime(2100, 12, 31);
+            txtDataFim.MinDate = new DateTime(1900, 1, 1);
+            txtDataFim.MaxDate = new DateTime(2100, 12, 31);
             txtDataFim.CustomFormat = "dd/MM/yyyy";
             txtDataInicio.CustomFormat = "dd/MM/yyyy";
         }
@@ -153,6 +157,8 @@ namespace MeuBNB
             this.txtTelefone.Enabled = false;
             this.txtValorPago.Enabled = false;
             this.txtFormaPag.Enabled = false;
+            this.btnBuscar.Enabled = false;
+            this.txtIdImovel.Enabled = false;
         }
         public override void DesbloqTxt()
         {
@@ -166,6 +172,8 @@ namespace MeuBNB
             this.txtTelefone.Enabled = true;
             this.txtValorPago.Enabled = true;
             this.txtFormaPag.Enabled = true;
+            this.btnBuscar.Enabled = true;
+            this.txtIdImovel.Enabled = true;
         }
         public override void ConhecaObj(object obj, object ctrl)
         {

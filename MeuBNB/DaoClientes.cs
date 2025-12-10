@@ -12,13 +12,35 @@ namespace MeuBNB
         public override string Salvar(object obj)
         {
             Clientes cliente = (Clientes)obj;
+            // Garante conexão aberta (herança da classe DAO)
+            if (cnn.State != System.Data.ConnectionState.Open) cnn.Open();
+
+            //Verifica se há sobreposição de datas para o mesmo imóvel
+            // Lógica: Se (DataInicio Nova < DataFim Existente) E (DataFim Nova > DataInicio Existente), há sobreposição.
+            string sqlVerifica = @"SELECT COUNT(*) FROM Clientes 
+                           WHERE idImovel = @idImovel 
+                           AND idCliente != @idCliente 
+                           AND (dataInicioReserva < @dataFimNova AND dataFimReserva > @dataInicioNova)";
+
+            using (SqlCommand cmdVerifica = new SqlCommand(sqlVerifica, cnn))
+            {
+                cmdVerifica.Parameters.AddWithValue("@idImovel", cliente.OImovel.IdImovel);
+                cmdVerifica.Parameters.AddWithValue("@idCliente", cliente.IdCliente); // Ignora a própria reserva em caso de edição
+                cmdVerifica.Parameters.AddWithValue("@dataInicioNova", cliente.DataInicioReserva);
+                cmdVerifica.Parameters.AddWithValue("@dataFimNova", cliente.DataFimReserva);
+                int conflitos = (int)cmdVerifica.ExecuteScalar();
+                if (conflitos > 0)
+                    throw new Exception("O imóvel já possui uma reserva confirmada para este período de datas.");
+            }
             string sql;
             if (cliente.IdCliente == 0)
                 sql = "insert into clientes(nome, cpf, telefone, diarias, qtdPessoas, dataInicioReserva, dataFimReserva, valorPago, formaPagamento, idImovel) values (@nome, @cpf, @telefone, @diarias, @qtdPessoas, @dataInicioReserva, @dataFimReserva, @valorPago, @formaPagamento, @idImovel)";
             else
                 sql = "update clientes set nome=@nome, cpf=@cpf, telefone=@telefone, diarias=@diarias, qtdPessoas=@qtdPessoas, dataInicioReserva=@dataInicioReserva, dataFimReserva=@dataFimReserva, valorPago=@valorPago, formaPagamento=@formaPagamento, idImovel=@idImovel where idCliente=@idCliente";
+
             try
             {
+                string mensagemRetorno = "";
                 using (SqlCommand cmd = new SqlCommand(sql, cnn))
                 {
                     cmd.Parameters.AddWithValue("@idCliente", cliente.IdCliente);
@@ -32,21 +54,30 @@ namespace MeuBNB
                     cmd.Parameters.AddWithValue("@valorPago", cliente.ValorPago);
                     cmd.Parameters.AddWithValue("@formaPagamento", cliente.FormaPagamento);
                     cmd.Parameters.AddWithValue("@idImovel", cliente.OImovel.IdImovel);
+
                     cmd.ExecuteNonQuery();
+
                     if (cliente.IdCliente == 0)
                     {
                         cmd.CommandText = "select @@identity";
-                        return "Cliente salvo com sucesso! ID: " + cmd.ExecuteScalar().ToString();
+                        mensagemRetorno = "Cliente salvo com sucesso! ID: " + cmd.ExecuteScalar().ToString();
                     }
                     else
-                    {
-                        return "Dados do cliente atualizados com sucesso!";
-                    }
+                        mensagemRetorno = "Dados do cliente atualizados com sucesso!";
                 }
+                //Atualiza a disponibilidade do imóvel para 'RESERVADO'
+                string sqlAtualizaImovel = "UPDATE Imoveis SET disponibilidade = 'RESERVADO' WHERE idImovel = @idImovel";
+                using (SqlCommand cmdImovel = new SqlCommand(sqlAtualizaImovel, cnn))
+                {
+                    cmdImovel.Parameters.AddWithValue("@idImovel", cliente.OImovel.IdImovel);
+                    cmdImovel.ExecuteNonQuery();
+                }
+
+                return mensagemRetorno;
             }
             catch (SqlException ex)
             {
-                if (ex.Number == 547) // Erro de chave estrangeira (Imóvel inexistente)
+                if (ex.Number == 547)
                     throw new Exception("O Imóvel selecionado não existe ou é inválido.");
 
                 throw new Exception("Erro ao salvar cliente: " + ex.Message);
